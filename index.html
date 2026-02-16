@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YOSH! - Windows向けカンバン式タスク管理アプリ</title>
+  <style>
+    :root {
+      --primary: #3B82F6;
+      --primary-dark: #2563EB;
+      --surface: #FFFFFF;
+      --background: #F5F5F5;
+      --text: #1A1A1A;
+      --text-subtle: #4B5563;
+      --border: #E5E7EB;
+      --column-header: #EFF6FF;
+      --accent-red: #EF4444;
+      --accent-yellow: #F59E0B;
+      --accent-blue: #3B82F6;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Yu Gothic UI', 'Segoe UI', 'Hiragino Sans', sans-serif;
+      color: var(--text);
+      background: var(--background);
+      line-height: 1.8;
+    }
+
+    /* ───── Hero ───── */
+    .hero {
+      background: linear-gradient(135deg, #1E3A5F 0%, #2563EB 100%);
+      color: #FFFFFF;
+      text-align: center;
+      padding: 80px 24px 64px;
+    }
+
+    .hero-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      opacity: 0.9;
+      max-width: 520px;
+      margin: 0 auto 32px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      padding: 6px 20px;
+      font-size: 14px;
+    }
+
+    /* ───── Section ───── */
+    .section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 64px 24px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+      font-size: 15px;
+      color: var(--text-subtle);
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    /* ───── Features ───── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 28px;
+    }
+
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text-subtle);
+      line-height: 1.7;
+    }
+
+    /* ───── Kanban Preview ───── */
+    .preview-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .kanban-preview {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .kanban-col {
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .kanban-col-header {
+      background: var(--column-header);
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .kanban-col-body {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 120px;
+    }
+
+    .kanban-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .kanban-card .title {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .kanban-card .meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+
+    .priority-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .priority-dot.high { background: var(--accent-red); }
+    .priority-dot.medium { background: var(--accent-yellow); }
+    .priority-dot.low { background: var(--accent-blue); }
+
+    /* ───── Spec Table ───── */
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .spec-table th,
+    .spec-table td {
+      text-align: left;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .spec-table th {
+      width: 200px;
+      font-weight: 600;
+      color: var(--text-subtle);
+      background: var(--background);
+    }
+
+    /* ───── Links ───── */
+    .links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .link-card {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 28px 36px;
+      text-decoration: none;
+      color: var(--text);
+      text-align: center;
+      min-width: 220px;
+      transition: border-color 0.2s;
+    }
+
+    .link-card:hover {
+      border-color: var(--primary);
+    }
+
+    .link-card .link-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .link-card .link-label {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .link-card .link-desc {
+      font-size: 12px;
+      color: var(--text-subtle);
+      margin-top: 4px;
+    }
+
+    /* ───── Footer ───── */
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      font-size: 13px;
+      color: var(--text-subtle);
+      border-top: 1px solid var(--border);
+    }
+
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 36px; }
+      .hero p { font-size: 16px; }
+      .kanban-preview { grid-template-columns: 1fr; }
+      .spec-table th { width: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-icon">&#x1F449;</div>
+    <h1>YOSH!</h1>
+    <p>シンプルで直感的なカンバン式タスク管理アプリ。<br>あなたのタスクを「未着手・進行中・完了」で整理します。</p>
+    <span class="hero-badge">Windows Desktop App</span>
+  </section>
+
+  <!-- Features -->
+  <section class="section">
+    <h2 class="section-title">特長</h2>
+    <p class="section-subtitle">シンプルだからこそ、すぐに使いこなせる</p>
+    <div class="features">
+
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F4CB;</div>
+        <h3>カンバンボード</h3>
+        <p>「未着手」「進行中」「完了」の3カラムでタスクの状態を一目で把握。ドラッグ&ドロップで直感的にステータスを変更できます。</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F4C1;</div>
+        <h3>マルチボード</h3>
+        <p>プロジェクトや目的ごとにボードを分けて管理。タブ切り替えでワークスペースを素早く移動できます（最大20ボード）。</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F50D;</div>
+        <h3>検索とソート</h3>
+        <p>キーワード検索でタスクを即座に絞り込み。作成日・優先度・締切日など、用途に合わせた並び替えも可能です。</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F3F7;&#xFE0F;</div>
+        <h3>優先度と締切日</h3>
+        <p>各タスクに High / Medium / Low の優先度と締切日を設定。色分けされたバッジで重要なタスクが一目でわかります。</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">&#x1F512;</div>
+        <h3>完全ローカル保存</h3>
+        <p>すべてのデータは端末内のSQLiteに保存。ネットワーク通信は一切行わないため、プライバシーを確実に保護します。</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">&#x21A9;&#xFE0F;</div>
+        <h3>元に戻す</h3>
+        <p>タスクの削除やステータス変更を誤っても安心。操作直後に表示されるトーストから、ワンクリックで元に戻せます。</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Kanban Preview -->
+  <section class="preview-section">
+    <div class="section" style="padding-bottom: 48px;">
+      <h2 class="section-title">カンバンで一目瞭然</h2>
+      <p class="section-subtitle">ドラッグ&ドロップでタスクを自由に移動</p>
+      <div class="kanban-preview">
+
+        <div class="kanban-col">
+          <div class="kanban-col-header">未着手</div>
+          <div class="kanban-col-body">
+            <div class="kanban-card">
+              <div class="title">ドキュメント作成</div>
+              <div class="meta"><span class="priority-dot high"></span>High &middot; 2/20</div>
+            </div>
+            <div class="kanban-card">
+              <div class="title">UIデザインの確認</div>
+              <div class="meta"><span class="priority-dot medium"></span>Medium</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-col-header">進行中</div>
+          <div class="kanban-col-body">
+            <div class="kanban-card">
+              <div class="title">API実装</div>
+              <div class="meta"><span class="priority-dot high"></span>High &middot; 2/18</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-col-header">完了</div>
+          <div class="kanban-col-body">
+            <div class="kanban-card">
+              <div class="title">環境構築</div>
+              <div class="meta"><span class="priority-dot low"></span>Low</div>
+            </div>
+            <div class="kanban-card">
+              <div class="title">要件定義</div>
+              <div class="meta"><span class="priority-dot medium"></span>Medium</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Spec -->
+  <section class="section">
+    <h2 class="section-title">アプリ情報</h2>
+    <p class="section-subtitle">動作環境と仕様</p>
+    <table class="spec-table">
+      <tr><th>アプリ名</th><td>YOSH!</td></tr>
+      <tr><th>対応OS</th><td>Windows 10 / 11</td></tr>
+      <tr><th>フレームワーク</th><td>Flutter (Fluent UI)</td></tr>
+      <tr><th>データ保存</th><td>SQLite（ローカル保存）</td></tr>
+      <tr><th>ネットワーク</th><td>不要（オフラインで動作）</td></tr>
+      <tr><th>テーマ</th><td>ライト / ダーク / システム連動</td></tr>
+      <tr><th>バージョン</th><td>1.0.0</td></tr>
+      <tr><th>開発者</th><td>ysen</td></tr>
+    </table>
+  </section>
+
+  <!-- Links -->
+  <section class="section" style="padding-top: 0;">
+    <h2 class="section-title">サポート</h2>
+    <p class="section-subtitle">お困りの際はこちらをご確認ください</p>
+    <div class="links">
+      <a class="link-card" href="privacy-policy">
+        <div class="link-icon">&#x1F6E1;&#xFE0F;</div>
+        <div class="link-label">プライバシーポリシー</div>
+        <div class="link-desc">データの取り扱いについて</div>
+      </a>
+      <a class="link-card" href="support">
+        <div class="link-icon">&#x2753;</div>
+        <div class="link-label">サポート・FAQ</div>
+        <div class="link-desc">よくあるご質問と問い合わせ</div>
+      </a>
+      <a class="link-card" href="https://github.com/ys39/yosh-support/issues">
+        <div class="link-icon">&#x1F4AC;</div>
+        <div class="link-label">お問い合わせ</div>
+        <div class="link-desc">不具合報告・機能リクエスト</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2026 ysen. All rights reserved. &nbsp;|&nbsp;
+    <a href="https://github.com/ys39/yosh-support">GitHub</a>
+  </footer>
+
+</body>
+</html>
